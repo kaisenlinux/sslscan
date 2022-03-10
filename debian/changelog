@@ -1,0 +1,5 @@
+sslscan (2.0.12-1kaisen) kaisen-packages; urgency=medium
+
+  * First packaging for Kaisen Linux
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Thu, 10 Mar 2022 16:24:38 +0100

@@ -1,0 +1,14 @@
+Source: sslscan
+Section: net
+Priority: optional
+Maintainer: Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>
+Build-Depends: debhelper-compat (= 13), libssl-dev, zlib1g-dev, git, ca-certificates
+Standards-Version: 4.6.0
+Homepage: https://github.com/rbsec/sslscan/
+Vcs-Browser: https://gitlab.com/kaisenlinux/packages/sslscan
+Vcs-Git: https://gitlab.com/kaisenlinux/packages/sslscan.git
+
+Package: sslscan
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SSL/TLS scanner
