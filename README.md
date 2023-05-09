@@ -92,6 +92,20 @@ This will clone the [OpenSSL repository](https://github.com/openssl/openssl), an
 
 You can verify whether you have a statically linked OpenSSL version, by checking whether the version listed by `sslscan --version` has the `-static` suffix.
 
+### Building with Docker
+
+Ensure that you local Docker installation is functional, and the build the container with:
+
+    make docker
+
+Or manually with:
+
+   docker build -t sslscan:sslscan .
+
+You can then run sslscan with:
+
+   docker run --rm -ti sslscan:sslscan --help
+
 ### Building on Windows
 
 Thanks to a patch by jtesta, sslscan can now be compiled on Windows. This can either be done natively or by cross-compiling from Linux. See INSTALL for instructions.

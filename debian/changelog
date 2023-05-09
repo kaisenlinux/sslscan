@@ -1,3 +1,11 @@
+sslscan (2.0.16-1kaisen) kaisen-packages; urgency=medium
+
+  * Import 2.0.16 version
+  * Disable running the Docker test
+  * Remove the quilt patch (unused)
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Tue, 09 May 2023 11:55:46 +0100
+
 sslscan (2.0.15-1kaisen) kaisen-packages; urgency=medium
 
   * Import 2.0.15 version
