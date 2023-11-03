@@ -1,5 +1,18 @@
 Changelog
 =========
+Version: 2.1.1
+Date   : 19/09/2023
+Author : rbsec <robin@rbsec.net>
+Changes: The following are a list of changes
+		 > Work around several dodgy TLS implementations (credit jtesta)
+
+Version: 2.1.0
+Date   : 05/09/2023
+Author : rbsec <robin@rbsec.net>
+Changes: The following are a list of changes
+		 > Build against OpenSSL 3.0 instead of 1.1.0 (credit jtesta)
+		 > Improve CPU detection on OSX (tetlowgm)
+
 Version: 2.0.16
 Date   : 08/04/2023
 Author : rbsec <robin@rbsec.net>

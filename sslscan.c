@@ -1793,7 +1793,7 @@ void outputCipher(struct sslCheckOptions *options, SSL *ssl, const char *cleanSs
             printf("%s%-29s%s", COL_YELLOW, ciphername, RESET);
         }
         strength = "medium";
-    } else if ((strstr(ciphername, "CHACHA20") || (strstr(ciphername, "GCM"))) && strstr(ciphername, "DHE")) {
+    } else if ((strstr(ciphername, "CHACHA20") || (strstr(ciphername, "GCM"))) && (strstr(ciphername, "DHE") || (strcmp(cleanSslMethod, "TLSv1.3") == 0))) {
         if (options->ianaNames) {
             printf("%s%-45s%s", COL_GREEN, ciphername, RESET);
         }
@@ -1871,20 +1871,18 @@ int testCipher(struct sslCheckOptions *options, const SSL_METHOD *sslMethod)
 
                 // Connect SSL over socket
                 cipherStatus = SSL_connect(ssl);
+                printf_verbose("SSL_connect() returned: %d\n", cipherStatus);
 
                 sslCipherPointer = SSL_get_current_cipher(ssl);
+                if (sslCipherPointer == NULL) {
+                  printf_verbose("SSL_get_current_cipher() returned NULL; this indicates that the server did not choose a cipher from our list (%s)\n", options->cipherstring);
+                  SSL_shutdown(ssl);
+                  FREE_SSL(ssl);
+                  CLOSE(socketDescriptor);
+                  return false;
+                }
+
                 cipherbits = SSL_CIPHER_get_bits(sslCipherPointer, NULL);
-
-                if (cipherStatus == 0)
-                {
-                    return false;
-                }
-                else if (cipherStatus != 1)
-                {
-                    printf_verbose("SSL_get_error(ssl, cipherStatus) said: %d\n", SSL_get_error(ssl, cipherStatus));
-                    return false;
-                }
-
                 cipherid = SSL_CIPHER_get_id(sslCipherPointer);
                 cipherid = cipherid & 0x00ffffff;  // remove first byte which is the version (0x03 for TLSv1/SSLv3)
 
@@ -1907,24 +1905,18 @@ int testCipher(struct sslCheckOptions *options, const SSL_METHOD *sslMethod)
 		  milliseconds_elapsed = tval_elapsed.tv_sec * 1000 + (int)tval_elapsed.tv_usec / 1000;
 		}
 
-                outputCipher(options, ssl, cleanSslMethod, cipherid, ciphername, cipherbits, (cipherStatus == 1), milliseconds_elapsed);
+                outputCipher(options, ssl, cleanSslMethod, cipherid, ciphername, cipherbits, 1, milliseconds_elapsed);
 
                 // Disconnect SSL over socket
-                if (cipherStatus == 1)
-                {
-                    const char *usedcipher = SSL_get_cipher_name(ssl);
-                    if(sslMethod==TLSv1_3_client_method())
-                    { // Remove cipher from TLSv1.3 list
-                      cipherRemove(options->cipherstring, usedcipher);
-                    }
-                    else
-                    {
-                      // Using strcat rather than strncat to avoid a warning from GCC
-                      strcat(options->cipherstring, ":!");
-                      strncat(options->cipherstring, usedcipher, strlen(usedcipher));
-                    }
-                    SSL_shutdown(ssl);
+                const char *usedcipher = SSL_get_cipher_name(ssl);
+                if(sslMethod == TLSv1_3_client_method())
+                  cipherRemove(options->cipherstring, usedcipher);  // Remove cipher from TLSv1.3 list
+                else {
+                  // Using strcat rather than strncat to avoid a warning from GCC
+                  strcat(options->cipherstring, ":!");
+                  strncat(options->cipherstring, usedcipher, strlen(usedcipher));
                 }
+                SSL_shutdown(ssl);
 
                 // Free SSL object
                 FREE_SSL(ssl);
@@ -5372,8 +5364,14 @@ bs *makeClientHello(struct sslCheckOptions *options, unsigned int tls_version, b
     bs_append_uint32_t(client_hello, rand);
   }
 
-  /* Session ID Length: 0 */
-  bs_append_bytes(client_hello, (unsigned char []) { 0x00 }, 1);
+  /* Session ID Length: 32 */
+  bs_append_bytes(client_hello, (unsigned char []) { 32 }, 1);
+
+  /* A "random" 32-byte session ID. */
+  for (int i = 0; i < 8; i++) {
+    rand += (time_now ^ (uint32_t)((~(i + 0) << 24) | (~(i + 1) << 16) | (~(i + 2) << 8) | (~(i + 3) << 0)));
+    bs_append_uint32_t(client_hello, rand);
+  }
 
   /* Add the length (in bytes) of the ciphersuites list to the Client Hello. */
   bs_append_ushort(client_hello, bs_get_len(ciphersuite_list));
