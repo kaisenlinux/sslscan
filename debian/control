@@ -9,6 +9,6 @@ Vcs-Browser: https://gitlab.com/kaisenlinux/packages/sslscan
 Vcs-Git: https://gitlab.com/kaisenlinux/packages/sslscan.git
 
 Package: sslscan
-Architecture: any
+Architecture: amd64 arm64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SSL/TLS scanner

@@ -1,3 +1,9 @@
+sslscan (2.1.3-1kaisen) kaisen-packages; urgency=medium
+
+  * Import the 2.1.3 release
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Wed, 08 May 2024 19:07:08 +0100
+
 sslscan (2.1.1-1kaisen) kaisen-packages; urgency=medium
 
   * Import the 2.1.1 version
